@@ -1,0 +1,11 @@
+{
+  "name": "image-generator",
+  "version": "1.0.0",
+  "description": "AI Image Generator powered by kawayi.shop API",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}

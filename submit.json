@@ -1,0 +1,19 @@
+"https://image.kawayi.shop/task/submit"
+-H "Content-Type: application/json"
+-d '{
+"prompt": "cowboy",
+"model": "seedream_5_0_lite",
+"size": "16:9",
+"quality": "4K",
+"n": 1,
+"response_format": "url"
+}' POST https://image.kawayi.shop/task/submit
+──────────────────────────────
+
+✅ 200 OK · 208ms · 69 B
+📋 application/json
+
+{
+"error": "Daily generation limit (600) reached. Try again tomorrow."
+}
+

@@ -1,0 +1,189 @@
+
+
+
+  
+  
+  AI 圖片生成工具
+  
+  
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #6366f1;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  
+
+
+  
+    
+    
+      ✨ AI 圖片生成器
+      由 Seedream 5.0 Lite 模型驅動
+    
+
+    
+    
+
+      
+      
+        圖片描述 (Prompt)
+        
+      
+
+      
+      
+
+        
+          尺寸比例
+          
+            16:9 橫向
+            1:1 正方形
+            9:16 直向
+            4:3 標準
+          
+        
+
+        
+          畫質
+          
+            4K 超高清
+            HD 高清
+            SD 標準
+          
+        
+
+        
+          模型
+          
+            Seedream 5.0 Lite
+          
+        
+
+        
+          生成數量
+          
+            1 張
+            2 張
+            4 張
+          
+        
+      
+
+      
+      
+        🎨 生成圖片
+      
+    
+
+    
+    
+      
+      正在生成中，請稍候...
+    
+
+    
+    
+
+    
+    
+
+    
+    Powered by image.kawayi.shop · 每日限額 600 次
+  
+
+  
+    const generateBtn = document.getElementById('generateBtn')
+    const loadingArea = document.getElementById('loadingArea')
+    const errorArea = document.getElementById('errorArea')
+    const resultArea = document.getElementById('resultArea')
+
+    generateBtn.addEventListener('click', async () => {
+      const prompt = document.getElementById('prompt').value.trim()
+      const size = document.getElementById('size').value
+      const quality = document.getElementById('quality').value
+      const model = document.getElementById('model').value
+      const n = parseInt(document.getElementById('n').value)
+
+      if (!prompt) {
+        showError('請輸入圖片描述 (Prompt)')
+        return
+      }
+
+      // 重置狀態
+      errorArea.classList.add('hidden')
+      resultArea.innerHTML = ''
+      loadingArea.classList.remove('hidden')
+      loadingArea.classList.add('flex')
+      generateBtn.disabled = true
+      generateBtn.textContent = '⏳ 生成中...'
+
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt, size, quality, model, n, response_format: 'url' })
+        })
+
+        const data = await res.json()
+
+        if (!res.ok || data.error) {
+          showError(data.error || '生成失敗，請稍後再試')
+          return
+        }
+
+        displayResults(data, prompt)
+
+      } catch (err) {
+        showError('網路錯誤，請檢查連線後重試')
+      } finally {
+        loadingArea.classList.add('hidden')
+        loadingArea.classList.remove('flex')
+        generateBtn.disabled = false
+        generateBtn.textContent = '🎨 生成圖片'
+      }
+    })
+
+    function displayResults(data, prompt) {
+      const urls = []
+
+      if (data.url) {
+        urls.push(data.url)
+      } else if (Array.isArray(data.images)) {
+        data.images.forEach(img => urls.push(img.url || img))
+      } else if (Array.isArray(data.data)) {
+        data.data.forEach(img => urls.push(img.url || img))
+      }
+
+      if (urls.length === 0) {
+        showError('無法解析回應中的圖片 URL，原始回應：' + JSON.stringify(data))
+        return
+      }
+
+      urls.forEach((url) => {
+        const card = document.createElement('div')
+        card.className = 'bg-white/10 rounded-2xl overflow-hidden shadow-xl'
+        card.innerHTML = `
+          
+          
+            ${prompt}
+            ⬇ 下載
+          
+        `
+        resultArea.appendChild(card)
+      })
+    }
+
+    function showError(msg) {
+      errorArea.textContent = '⚠️ ' + msg
+      errorArea.classList.remove('hidden')
+    }
+  
+
+
+
